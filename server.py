@@ -7,7 +7,7 @@ import json
 from pprint import pprint
 
 # socket imports
-from network import read
+from network import read, write
 
 
 
@@ -17,6 +17,8 @@ class Server:
     def __init__(self, address):
         # opening a socket
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # for keeping the connections
+        self.__sockets = []
 
         self.__start(address)
 
@@ -34,14 +36,18 @@ class Server:
 
             print(f"==> {address[0]} connected on port {address[1]}")
 
-            self.__get_info(connection)
-
-            connection.close()
+            self.__sockets.append(connection)
     
     # get info reads user data from sockets
-    def __get_info(self, sock):
+    def __get_info(self, index):
+        sock = self.__sockets[index]
         info = json.loads(read(sock).decode('utf-8'))
         pprint(info)
+    
+    # close socket closes a client connection
+    def __close_socket(self, index):
+        self.__sockets[index].close()
+        self.__sockets.pop(index)
     
     # close server method shutdowns the server socket
     def close_server(self):
