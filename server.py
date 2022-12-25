@@ -48,7 +48,8 @@ class Server:
     # close socket closes a client connection
     def __close_socket(self, index):
         self.__sockets[index].close()
-        self.__sockets.pop(index)
+        print('Closed:')
+        pprint(self.__sockets.pop(index))
     
     # print sockets generates sockets information for user
     def __print_sockets(self):
@@ -64,8 +65,19 @@ class Server:
         
         print()
     
+    # process the commands to server
+    def process(command, index):
+        if command == 'sysinfo':
+            self.__get_info(index)
+        elif command == 'close':
+            self.__close_socket(index)
+        else:
+            self.__print_sockets()
+    
     # close server method shutdowns the server socket
     def close_server(self):
+        [s.close() for s in self.__sockets]
+
         self.__sock.close()
 
         exit(0)
