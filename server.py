@@ -2,6 +2,12 @@
 import socket
 # system imports
 import signal
+# protocol imports
+import json
+from pprint import pprint
+
+# socket imports
+from network import read
 
 
 
@@ -12,10 +18,10 @@ class Server:
         # opening a socket
         self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        self.__start__(address)
+        self.__start(address)
 
     # start method will bind and start our server
-    def __start__(self, address): 
+    def __start(self, address): 
         self.__sock.bind(address)
         self.__sock.listen(0)
 
@@ -28,7 +34,14 @@ class Server:
 
             print(f"==> {address[0]} connected on port {address[1]}")
 
+            self.__get_info(connection)
+
             connection.close()
+    
+    # get info reads user data from sockets
+    def __get_info(self, sock):
+        info = json.loads(read(sock).decode('utf-8'))
+        pprint(info)
     
     # close server method shutdowns the server socket
     def close_server(self):
