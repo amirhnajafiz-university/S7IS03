@@ -93,4 +93,14 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, server.close_server)
 
     # start accepting clients
-    server.handle()
+    conn_thread = threading.Thread(target=server.handle, daemon=True)
+    conn_thread.start()
+    
+    # getting inputs
+    while True:
+        command = input('> ').split()
+
+        if command[0] == 'exit':  # with exit command, terminate
+            exit(0)
+
+        server.process(command[0], int(command[1])-1)
