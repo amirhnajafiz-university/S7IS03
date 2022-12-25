@@ -2,6 +2,7 @@
 import socket
 # system imports
 import signal
+import threading
 # protocol imports
 import json
 from pprint import pprint
@@ -48,6 +49,20 @@ class Server:
     def __close_socket(self, index):
         self.__sockets[index].close()
         self.__sockets.pop(index)
+    
+    # print sockets generates sockets information for user
+    def __print_sockets(self):
+        print()
+
+        sockets = [f"{s.getpeername()[0]}:{s.getpeername()[1]}" for s in self.__sockets]
+        if len(sockets) < 1:
+            return
+        
+        print("Enter [sysinfo/close] [index] to get peer system information or close connection:")
+        for i, p in enumerate(sockets):
+            print(f"\t[{i + 1}] {p}")
+        
+        print()
     
     # close server method shutdowns the server socket
     def close_server(self):
