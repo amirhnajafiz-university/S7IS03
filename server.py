@@ -1,7 +1,6 @@
 # network imports
 import socket
 # system imports
-import signal
 import threading
 # protocol imports
 import json
@@ -60,7 +59,7 @@ class Server:
         write(sock, CMD_CLOSE.encode('utf-8'))
 
         sock.close()
-        
+
         print('Closed:')
         print(sock)
         print()
@@ -102,10 +101,7 @@ class Server:
 # start server
 if __name__ == "__main__":
     # creating a server instance
-    server = Server(("0.0.0.0", 3232))
-
-    # if kill signal sent, close server
-    signal.signal(signal.SIGINT, server.close_server)
+    server = Server(("0.0.0.0", 5000))
 
     # start accepting clients
     conn_thread = threading.Thread(target=server.handle, daemon=True)
@@ -116,6 +112,8 @@ if __name__ == "__main__":
         command = input().split()
 
         if command[0] == CMD_EXIT:  # with exit command, terminate
+            server.close_server()
+
             exit(0)
 
         if len(command) < 2:
