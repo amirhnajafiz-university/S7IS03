@@ -1,7 +1,7 @@
 # network imports
 import socket
-
-
+# system imports
+import signal
 
 # Server is for creating a listener which can accept clients.
 class Server:
@@ -26,12 +26,23 @@ class Server:
 
             print(f"==> {address[0]} connected on port {address[1]}")
 
+            connection.close()
+    
+    # close server method shutdowns the server socket
+    def close_server(self):
+        self.__sock.close()
+
+        exit(0)
+
 
 
 # start server
 if __name__ == "__main__":
     # creating a server instance
     server = Server(("0.0.0.0", 3232))
+
+    # if kill signal sent, close server
+    signal.signal(signal.SIGINT, server.close_server)
 
     # start accepting clients
     server.handle()
