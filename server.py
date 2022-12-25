@@ -12,6 +12,13 @@ from network import read, write
 
 
 
+# constant variables
+CMD_EXIT = "exit"
+CMD_SYSINFO = "sysinfo"
+CMD_CLOSE = "close"
+
+
+
 # Server is for creating a listener which can accept clients.
 class Server:
     # constructor
@@ -35,30 +42,38 @@ class Server:
         while True:
             connection, address = self.__sock.accept()
 
-            print(f"==> {address[0]} connected on port {address[1]}")
+            print(f"=> {address[0]} connected on port {address[1]}")
 
             self.__sockets.append(connection)
     
     # get info reads user data from sockets
     def __get_info(self, index):
         sock = self.__sockets[index]
+        write(sock, CMD_SYSINFO.encode('utf-8'))
         info = json.loads(read(sock).decode('utf-8'))
         pprint(info)
     
     # close socket closes a client connection
     def __close_socket(self, index):
-        self.__sockets[index].close()
+        sock = self.__sockets.pop(index)
+
+        write(sock, CMD_CLOSE.encode('utf-8'))
+
+        sock.close()
+        
         print('Closed:')
-        pprint(self.__sockets.pop(index))
+        print(sock)
+        print()
     
     # print sockets generates sockets information for user
     def __print_sockets(self):
-        print()
-
         sockets = [f"{s.getpeername()[0]}:{s.getpeername()[1]}" for s in self.__sockets]
         if len(sockets) < 1:
+            print('Empty')
+
             return
         
+        print()
         print("Enter [sysinfo/close] [index] to get peer system information or close connection:")
         for i, p in enumerate(sockets):
             print(f"\t[{i + 1}] {p}")
@@ -66,10 +81,10 @@ class Server:
         print()
     
     # process the commands to server
-    def process(command, index):
-        if command == 'sysinfo':
+    def process(self, command, index):
+        if command == CMD_SYSINFO:
             self.__get_info(index)
-        elif command == 'close':
+        elif command == CMD_CLOSE:
             self.__close_socket(index)
         else:
             self.__print_sockets()
@@ -98,9 +113,12 @@ if __name__ == "__main__":
     
     # getting inputs
     while True:
-        command = input('> ').split()
+        command = input().split()
 
-        if command[0] == 'exit':  # with exit command, terminate
+        if command[0] == CMD_EXIT:  # with exit command, terminate
             exit(0)
+
+        if len(command) < 2:
+            command.append(0)
 
         server.process(command[0], int(command[1])-1)
