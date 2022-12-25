@@ -16,6 +16,6 @@ if __name__ == '__main__':
     # connect to server
     sock.connect((HOST, PORT))
 
-    print(f"connected to {HOSTNAME} on port {PORTNUMBER}")
+    print(f"connected to {HOST} on port {PORT}")
 
     sock.close()
